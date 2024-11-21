@@ -8,25 +8,25 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-gray-800 shadow-lg border-b border-gray-700">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-indigo-600">
+            <Link to="/" className="text-2xl font-bold text-indigo-400 hover:text-indigo-300">
               JoMovie
             </Link>
             {isAuthenticated && (
               <div className="ml-10 flex items-center space-x-4">
-                <Link to="/" className="text-gray-700 hover:text-indigo-600">
+                <Link to="/" className="text-gray-300 hover:text-indigo-400">
                   Home
                 </Link>
-                <Link to="/popular" className="text-gray-700 hover:text-indigo-600">
+                <Link to="/popular" className="text-gray-300 hover:text-indigo-400">
                   Popular
                 </Link>
-                <Link to="/search" className="text-gray-700 hover:text-indigo-600">
+                <Link to="/search" className="text-gray-300 hover:text-indigo-400">
                   <Search className="w-5 h-5" />
                 </Link>
-                <Link to="/wishlist" className="text-gray-700 hover:text-indigo-600">
+                <Link to="/wishlist" className="text-gray-300 hover:text-indigo-400">
                   <Heart className="w-5 h-5" />
                 </Link>
               </div>
@@ -38,7 +38,7 @@ export default function Navbar() {
                 logout();
                 navigate('/signin');
               }}
-              className="flex items-center text-gray-700 hover:text-indigo-600"
+              className="flex items-center text-gray-300 hover:text-indigo-400"
             >
               <LogOut className="w-5 h-5" />
               <span className="ml-2">Logout</span>
@@ -46,7 +46,7 @@ export default function Navbar() {
           ) : (
             <Link
               to="/signin"
-              className="flex items-center text-indigo-600 hover:text-indigo-800"
+              className="flex items-center text-indigo-400 hover:text-indigo-300"
             >
               Sign In
             </Link>
