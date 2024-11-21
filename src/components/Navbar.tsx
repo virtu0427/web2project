@@ -13,7 +13,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-bold text-indigo-600">
-              MovieDB
+              Jomovie
             </Link>
             {isAuthenticated && (
               <div className="ml-10 flex items-center space-x-4">
