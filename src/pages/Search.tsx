@@ -7,16 +7,23 @@ import { Movie } from '../types/movie';
 export default function Search() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
     try {
+      setIsLoading(true);
+      setError(null);
       const response = await searchMovies(query);
       setMovies(response.data.results);
     } catch (error) {
+      setError('Failed to search movies. Please try again later.');
       console.error('Error searching movies:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -37,14 +44,27 @@ export default function Search() {
             </div>
             <button
               type="submit"
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={isLoading}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              Search
+              {isLoading ? 'Searching...' : 'Search'}
             </button>
           </form>
         </div>
 
-        {movies.length > 0 && (
+        {error && (
+          <div className="text-center text-red-600 mb-8">
+            {error}
+          </div>
+        )}
+
+        {isLoading && (
+          <div className="text-center text-gray-600">
+            Searching...
+          </div>
+        )}
+
+        {!isLoading && movies.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {movies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
@@ -52,7 +72,7 @@ export default function Search() {
           </div>
         )}
 
-        {query && movies.length === 0 && (
+        {!isLoading && query && movies.length === 0 && !error && (
           <div className="text-center text-gray-600">
             No movies found for "{query}"
           </div>

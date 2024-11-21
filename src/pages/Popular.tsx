@@ -5,19 +5,42 @@ import { Movie } from '../types/movie';
 
 export default function Popular() {
   const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPopularMovies = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const response = await getPopularMovies();
         setPopularMovies(response.data.results);
       } catch (error) {
+        setError('Failed to fetch popular movies. Please try again later.');
         console.error('Error fetching popular movies:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPopularMovies();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">

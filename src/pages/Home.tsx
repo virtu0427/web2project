@@ -5,19 +5,42 @@ import { Movie } from '../types/movie';
 
 export default function Home() {
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTrendingMovies = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const response = await getTrendingMovies();
         setTrendingMovies(response.data.results);
       } catch (error) {
+        setError('Failed to fetch trending movies. Please try again later.');
         console.error('Error fetching trending movies:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTrendingMovies();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-xl text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
