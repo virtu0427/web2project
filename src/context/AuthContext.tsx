@@ -1,29 +1,70 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+interface User {
+  email: string;
+  password: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  currentUser: User | null;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  register: (email: string, password: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storedAuth = localStorage.getItem('isAuthenticated');
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedAuth === 'true' && storedUser) {
+      setIsAuthenticated(true);
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const register = async (email: string, password: string) => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userExists = users.some((user: User) => user.email === email);
+    
+    if (userExists) {
+      return false;
+    }
+
+    const newUser = { email, password };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    return true;
+  };
 
   const login = async (email: string, password: string) => {
-    // In a real app, you would validate credentials with your backend
-    if (email && password) {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: User) => u.email === email && u.password === password);
+    
+    if (user) {
       setIsAuthenticated(true);
+      setCurrentUser(user);
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      return true;
     }
+    return false;
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    setCurrentUser(null);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('currentUser');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, currentUser, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Movie } from '../types/movie';
+import { useAuth } from './AuthContext';
 
 interface WishlistContextType {
   wishlist: Movie[];
@@ -12,13 +13,31 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<Movie[]>([]);
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    if (currentUser) {
+      const storedWishlist = localStorage.getItem(`wishlist_${currentUser.email}`);
+      if (storedWishlist) {
+        setWishlist(JSON.parse(storedWishlist));
+      }
+    }
+  }, [currentUser]);
 
   const addToWishlist = (movie: Movie) => {
-    setWishlist((prev) => [...prev, movie]);
+    const updatedWishlist = [...wishlist, movie];
+    setWishlist(updatedWishlist);
+    if (currentUser) {
+      localStorage.setItem(`wishlist_${currentUser.email}`, JSON.stringify(updatedWishlist));
+    }
   };
 
   const removeFromWishlist = (movieId: number) => {
-    setWishlist((prev) => prev.filter((movie) => movie.id !== movieId));
+    const updatedWishlist = wishlist.filter((movie) => movie.id !== movieId);
+    setWishlist(updatedWishlist);
+    if (currentUser) {
+      localStorage.setItem(`wishlist_${currentUser.email}`, JSON.stringify(updatedWishlist));
+    }
   };
 
   const isInWishlist = (movieId: number) => {
