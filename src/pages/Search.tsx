@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
-import { Search as SearchIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search as SearchIcon, Clock } from 'lucide-react';
 import { searchMovies } from '../services/api';
 import MovieCard from '../components/MovieCard';
 import { Movie } from '../types/movie';
+import { useAuth } from '../context/AuthContext';
 
 export default function Search() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    if (currentUser) {
+      const history = localStorage.getItem(`searchHistory_${currentUser.email}`);
+      if (history) {
+        setSearchHistory(JSON.parse(history));
+      }
+    }
+  }, [currentUser]);
+
+  const addToSearchHistory = (searchQuery: string) => {
+    if (currentUser) {
+      const updatedHistory = [searchQuery, ...searchHistory.filter(q => q !== searchQuery)].slice(0, 5);
+      setSearchHistory(updatedHistory);
+      localStorage.setItem(`searchHistory_${currentUser.email}`, JSON.stringify(updatedHistory));
+    }
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,12 +39,18 @@ export default function Search() {
       setError(null);
       const response = await searchMovies(query);
       setMovies(response.data.results);
+      addToSearchHistory(query.trim());
     } catch (error) {
       setError('Failed to search movies. Please try again later.');
       console.error('Error searching movies:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleHistoryClick = (historyQuery: string) => {
+    setQuery(historyQuery);
+    handleSearch(new Event('submit') as any);
   };
 
   return (
@@ -50,6 +76,26 @@ export default function Search() {
               {isLoading ? 'Searching...' : 'Search'}
             </button>
           </form>
+
+          {searchHistory.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-gray-400 mb-2 flex items-center">
+                <Clock className="w-4 h-4 mr-1" />
+                Recent Searches
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {searchHistory.map((historyQuery, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleHistoryClick(historyQuery)}
+                    className="px-3 py-1 text-sm bg-gray-800 text-gray-300 rounded-full hover:bg-gray-700"
+                  >
+                    {historyQuery}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {error && (
