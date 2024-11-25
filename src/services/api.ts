@@ -11,10 +11,10 @@ const api = axios.create({
   baseURL: BASE_URL,
   params: {
     api_key: API_KEY,
-    language: 'ko-KR'  // 언어를 한국어로 설정
+    language: 'ko-KR'
   },
 });
 
-export const getPopularMovies = () => api.get('/movie/popular');
-export const searchMovies = (query: string) => api.get('/search/movie', { params: { query } });
+export const getPopularMovies = (page: number = 1) => api.get('/movie/popular', { params: { page } });
+export const searchMovies = (query: string, page: number = 1) => api.get('/search/movie', { params: { query, page } });
 export const getTrendingMovies = (page: number = 1) => api.get('/trending/movie/week', { params: { page } });
