@@ -16,7 +16,7 @@ export default function Popular() {
         const response = await getPopularMovies();
         setPopularMovies(response.data.results);
       } catch (error) {
-        setError('Failed to fetch popular movies. Please try again later.');
+        setError('인기 영화를 불러오는데 실패했습니다. 다시 시도해주세요.');
         console.error('Error fetching popular movies:', error);
       } finally {
         setIsLoading(false);
@@ -29,7 +29,7 @@ export default function Popular() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-xl text-gray-300">Loading...</div>
+        <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
@@ -43,10 +43,10 @@ export default function Popular() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-100 mb-8">Popular Movies</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="min-h-screen bg-gray-900 py-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+        <h1 className="text-2xl font-bold text-gray-100 mb-4">인기 영화</h1>
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4">
           {popularMovies.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
           ))}

@@ -11,6 +11,7 @@ const api = axios.create({
   baseURL: BASE_URL,
   params: {
     api_key: API_KEY,
+    language: 'ko-KR'  // 언어를 한국어로 설정
   },
 });
 

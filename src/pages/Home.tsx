@@ -29,7 +29,6 @@ export default function Home() {
         const response = await getTrendingMovies(page);
         setTrendingMovies(prev => {
           const newMovies = response.data.results;
-          // Remove duplicates based on movie ID
           const uniqueMovies = [...prev, ...newMovies].filter(
             (movie, index, self) => 
               index === self.findIndex(m => m.id === movie.id)
@@ -38,7 +37,7 @@ export default function Home() {
         });
         setHasMore(response.data.results.length > 0);
       } catch (error) {
-        setError('Failed to fetch trending movies. Please try again later.');
+        setError('영화를 불러오는데 실패했습니다. 다시 시도해주세요.');
         console.error('Error fetching trending movies:', error);
       } finally {
         setIsLoading(false);
@@ -57,10 +56,10 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-100 mb-8">Trending This Week</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="min-h-screen bg-gray-900 py-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+        <h1 className="text-2xl font-bold text-gray-100 mb-4">이번 주 인기 영화</h1>
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4">
           {trendingMovies.map((movie, index) => (
             <div
               key={`${movie.id}-${index}`}
@@ -72,7 +71,7 @@ export default function Home() {
         </div>
         {isLoading && (
           <div className="text-center py-4">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+            <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
           </div>
         )}
       </div>
