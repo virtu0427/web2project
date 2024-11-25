@@ -8,7 +8,7 @@ interface User {
 interface AuthContextType {
   isAuthenticated: boolean;
   currentUser: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, rememberMe: boolean) => Promise<boolean>;
   logout: () => void;
   register: (email: string, password: string) => Promise<boolean>;
 }
@@ -20,8 +20,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem('isAuthenticated');
-    const storedUser = localStorage.getItem('currentUser');
+    const storedAuth = localStorage.getItem('isAuthenticated') || sessionStorage.getItem('isAuthenticated');
+    const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
     if (storedAuth === 'true' && storedUser) {
       setIsAuthenticated(true);
       setCurrentUser(JSON.parse(storedUser));
@@ -42,15 +42,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe: boolean) => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: User) => u.email === email && u.password === password);
     
     if (user) {
       setIsAuthenticated(true);
       setCurrentUser(user);
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('isAuthenticated', 'true');
+      storage.setItem('currentUser', JSON.stringify(user));
       return true;
     }
     return false;
@@ -61,6 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(null);
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('currentUser');
   };
 
   return (
