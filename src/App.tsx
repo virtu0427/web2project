@@ -14,6 +14,11 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/signin" />;
 }
 
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/" /> : <>{children}</>;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -22,39 +27,32 @@ function App() {
           <div className="min-h-screen bg-gray-100">
             <Navbar />
             <Routes>
-              <Route path="/signin" element={<SignIn />} />
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <Home />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/popular"
-                element={
-                  <PrivateRoute>
-                    <Popular />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/search"
-                element={
-                  <PrivateRoute>
-                    <Search />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/wishlist"
-                element={
-                  <PrivateRoute>
-                    <Wishlist />
-                  </PrivateRoute>
-                }
-              />
+              <Route path="/signin" element={
+                <PublicRoute>
+                  <SignIn />
+                </PublicRoute>
+              } />
+              <Route path="/" element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              } />
+              <Route path="/popular" element={
+                <PrivateRoute>
+                  <Popular />
+                </PrivateRoute>
+              } />
+              <Route path="/search" element={
+                <PrivateRoute>
+                  <Search />
+                </PrivateRoute>
+              } />
+              <Route path="/wishlist" element={
+                <PrivateRoute>
+                  <Wishlist />
+                </PrivateRoute>
+              } />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </Router>
