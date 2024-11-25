@@ -11,7 +11,7 @@ import Wishlist from './pages/Wishlist';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="//signin" />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/signin" />;
 }
 
 function App() {
@@ -22,9 +22,9 @@ function App() {
           <div className="min-h-screen bg-gray-100">
             <Navbar />
             <Routes>
-              <Route path="/web2project/signin" element={<SignIn />} />
+              <Route path="/signin" element={<SignIn />} />
               <Route
-                path="/web2project/"
+                path="/"
                 element={
                   <PrivateRoute>
                     <Home />
@@ -32,7 +32,7 @@ function App() {
                 }
               />
               <Route
-                path="/web2project/popular"
+                path="/popular"
                 element={
                   <PrivateRoute>
                     <Popular />
@@ -40,7 +40,7 @@ function App() {
                 }
               />
               <Route
-                path="/web2project/search"
+                path="/search"
                 element={
                   <PrivateRoute>
                     <Search />
@@ -48,7 +48,7 @@ function App() {
                 }
               />
               <Route
-                path="/web2project/wishlist"
+                path="/wishlist"
                 element={
                   <PrivateRoute>
                     <Wishlist />
