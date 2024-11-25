@@ -16,5 +16,13 @@ const api = axios.create({
 });
 
 export const getPopularMovies = (page: number = 1) => api.get('/movie/popular', { params: { page } });
-export const searchMovies = (query: string, page: number = 1) => api.get('/search/movie', { params: { query, page } });
+export const searchMovies = (query: string, page: number = 1, genreId?: number) => 
+  api.get('/search/movie', { 
+    params: { 
+      query, 
+      page,
+      with_genres: genreId 
+    } 
+  });
 export const getTrendingMovies = (page: number = 1) => api.get('/trending/movie/week', { params: { page } });
+export const getGenres = () => api.get('/genre/movie/list');

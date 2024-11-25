@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search as SearchIcon, Clock } from 'lucide-react';
-import { searchMovies } from '../services/api';
+import { searchMovies, getGenres } from '../services/api';
 import MovieCard from '../components/MovieCard';
 import Pagination from '../components/Pagination';
 import ViewToggle from '../components/ViewToggle';
-import { Movie } from '../types/movie';
+import GenreFilter from '../components/GenreFilter';
+import { Movie, Genre } from '../types/movie';
 import { useAuth } from '../context/AuthContext';
 
 export default function Search() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +22,18 @@ export default function Search() {
   const [isInfiniteScroll, setIsInfiniteScroll] = useState(true);
   const { currentUser } = useAuth();
   const observer = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await getGenres();
+        setGenres(response.data.genres);
+      } catch (error) {
+        console.error('Error fetching genres:', error);
+      }
+    };
+    fetchGenres();
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
@@ -54,7 +69,7 @@ export default function Search() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await searchMovies(searchQuery, pageNum);
+      const response = await searchMovies(searchQuery, pageNum, selectedGenre?.id);
       setTotalPages(response.data.total_pages);
       
       if (append) {
@@ -87,6 +102,14 @@ export default function Search() {
     e.preventDefault();
     setPage(1);
     await performSearch(query, 1, false);
+  };
+
+  const handleGenreSelect = (genre: Genre | null) => {
+    setSelectedGenre(genre);
+    setPage(1);
+    if (query) {
+      performSearch(query, 1, false);
+    }
   };
 
   useEffect(() => {
@@ -164,6 +187,14 @@ export default function Search() {
           <div className="text-center text-red-400 mb-8">
             {error}
           </div>
+        )}
+
+        {genres.length > 0 && (
+          <GenreFilter
+            genres={genres}
+            selectedGenre={selectedGenre}
+            onGenreSelect={handleGenreSelect}
+          />
         )}
 
         {query && (
