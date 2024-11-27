@@ -8,6 +8,7 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const { login, register, isAuthenticated } = useAuth();
@@ -26,6 +27,10 @@ export default function SignIn() {
 
     try {
       if (isRegistering) {
+        if (!termsAccepted) {
+          setError('서비스 이용약관에 동의해주세요.');
+          return;
+        }
         if (password !== confirmPassword) {
           setError('비밀번호가 일치하지 않습니다.');
           return;
@@ -34,7 +39,7 @@ export default function SignIn() {
         if (success) {
           setShowSuccess(true);
           setTimeout(async () => {
-            await login(email, password, rememberMe);
+            await login(email, password, false);
             navigate('/');
           }, 2000);
         } else {
@@ -58,6 +63,7 @@ export default function SignIn() {
     setEmail('');
     setPassword('');
     setConfirmPassword('');
+    setTermsAccepted(false);
     setError('');
     setShowSuccess(false);
   };
@@ -188,17 +194,26 @@ export default function SignIn() {
                   required
                 />
               </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="register-remember-me"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-600 text-indigo-600 focus:ring-indigo-500 bg-gray-700"
-                />
-                <label htmlFor="register-remember-me" className="ml-2 block text-sm text-gray-300">
-                  로그인 상태 유지
-                </label>
+              <div className="space-y-2">
+                <div className="flex items-start">
+                  <div className="flex items-center h-5">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-600 text-indigo-600 focus:ring-indigo-500 bg-gray-700"
+                    />
+                  </div>
+                  <div className="ml-2">
+                    <label htmlFor="terms" className="text-sm text-gray-300">
+                      서비스 이용약관 및 개인정보 처리방침에 동의합니다
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      회원가입 시 JoMovie의 서비스 이용약관과 개인정보 처리방침에 동의하게 됩니다.
+                    </p>
+                  </div>
+                </div>
               </div>
               <button
                 type="submit"
