@@ -5,4 +5,4 @@ react, vite, typescript, TMDB
 
 ---
 ## 설치 및 실행 가이드
-npm install & npm run dev
+npm install & npm run start:dev 또는 npm run start:prod
